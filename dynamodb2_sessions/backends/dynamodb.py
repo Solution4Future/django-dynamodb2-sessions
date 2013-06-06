@@ -1,13 +1,14 @@
-from boto.dynamodb.exceptions import DynamoDBKeyNotFoundError
+from boto.dynamodb.exceptions import DynamoDBKeyNotFoundError, DynamoDBItemError
+from boto.dynamodb2 import connect_to_region
+from boto.dynamodb2.layer1 import DynamoDBConnection
 from boto.dynamodb2.table import Table
+from boto.regioninfo import RegionInfo
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
+from django.utils import timezone
 import logging
 import time
-from boto.regioninfo import RegionInfo
-from boto.dynamodb2.layer1 import DynamoDBConnection
-from boto.dynamodb2 import connect_to_region
 
 logger = logging.getLogger(__name__)
 
@@ -53,19 +54,19 @@ class SessionStore(SessionBase):
         :rtype: dict
         :returns: The de-coded session data, as a dict.
         """
-        #TODO: ugly
-#         import ipdb; ipdb.set_trace()
-        item = self.table.get_item(session_key = self.session_key, 
+        item = self.table.get_item(session_key = self.session_key,
                                    consistent = getattr(settings, 'DYNAMODB_SESSIONS_ALWAYS_CONSISTENT', False))
-        if item.items():
-            try:
+        try:
+            if not item.items():
+                raise DynamoDBItemError("Session expired")
+            if not item['expire_date'] > int(time.mktime(timezone.now().timetuple())):
+                raise DynamoDBItemError("Session expired")
+            else:
                 logger.info("Item got successfully")
                 return self.decode(item['data'])
-            except SuspiciousOperation:
-                self.create()
-                return {}
-        self.create()
-        return {}
+        except (SuspiciousOperation, DynamoDBItemError) as e:
+            self.create()
+            return {}
 
     def exists(self, session_key):
         """
@@ -110,9 +111,9 @@ class SessionStore(SessionBase):
             self._session_key = None
         
         self._get_or_create_session_key()
-        data = {'session_key': self._session_key, 'data': self.encode(self._get_session(no_load=must_create))}
+        data = {'session_key': self._session_key, 'data': self.encode(self._get_session(no_load=must_create)),
+                 'expire_date': int(time.mktime(self.get_expiry_date().timetuple())), 'created': int(time.time())}
         if must_create:
-            data['created'] = int(time.time())
             try:
                 self.table.put_item(data=data)
                 logger.info("Item created successfully")
@@ -122,7 +123,9 @@ class SessionStore(SessionBase):
             item = self.table.get_item(session_key = self._session_key, 
                                        consistent = getattr(settings, 'DYNAMODB_SESSIONS_ALWAYS_CONSISTENT', False))
             if not item.items():
-                item['session_key'] = data['session_key']
+#                 item['session_key'] = data['session_key']
+                self.table.put_item(data=data)
+                return
             item['data'] = data['data'] 
             item.save()
                 
@@ -144,3 +147,8 @@ class SessionStore(SessionBase):
                                        consistent = getattr(settings, 'DYNAMODB_SESSIONS_ALWAYS_CONSISTENT', False))
         if item.items():
             item.delete()
+            
+    @classmethod
+    def clear_expired(cls):
+        for session in self.table.query(expire_date__lt = int(time.mktime(timezone.now().timetuple()))):
+            session.delete()
