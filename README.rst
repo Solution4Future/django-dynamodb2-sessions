@@ -1,10 +1,10 @@
 django-dynamodb2-sessions
 =========================
 
-:Info: Sessions backend dedicated for Django uses Amazon `DynamoDB` v.2 for data storage.
+:Info: Sessions backend dedicated for Django uses Amazon `DynamoDB`_ v.2 for data storage.
 :Author: Justine Żarna
 
-If You need backend uses Amazon DynamoDB v. 1 see `Greg Taylor github`
+If You need backend uses Amazon DynamoDB v. 1 see `Greg Taylor github`_
 
 .. _DynamoDB: http://aws.amazon.com/dynamodb/
 .. _Greg Taylor github: https://github.com/gtaylor/django-dynamodb-sessions
