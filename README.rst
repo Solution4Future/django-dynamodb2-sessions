@@ -1,13 +1,13 @@
 django-dynamodb2-sessions
 =========================
 
-:Info: Sessions backend dedicated for Django uses Amazon _DynamoDB v.2 for data storage.
+:Info: Sessions backend dedicated for Django uses Amazon `DynamoDB` v.2 for data storage.
 :Author: Justine Żarna
 
-.. _DynamoDB: http://aws.amazon.com/dynamodb/
-.. _github: https://github.com/gtaylor/django-dynamodb-sessions
+If You need backend uses Amazon DynamoDB v. 1 see `Greg Taylor github`
 
-If You need backend uses Amazon DynamoDB v. 1 see Greg Taylor _github
+.. _DynamoDB: http://aws.amazon.com/dynamodb/
+.. _Greg Taylor github: https://github.com/gtaylor/django-dynamodb-sessions
 
 First step: create DynamoDB Table
 --------------------------
@@ -20,7 +20,7 @@ Visit your `DynamoDB tab`_ in the AWS Management Console and follow instructions
 * Select Hash Attribute Type as ``String``.
 * Enter ``session_key`` for *Hash Attribute Name*.
 * Choose the *Continue* option twice.
-* Fill Provisioned Throughput Capacity (only for tests: read - 10 units, write - 5 units).
+* Fill Provisioned Throughput Capacity (only for tests: ``read`` - 10 units, ``write`` - 5 units).
 * Choose the *Continue* option.
 * Choose the *Create* option.
 
@@ -52,7 +52,7 @@ Optional you can set always consistent parametr.
 If you are not using cache to this sessions backend you can force all reads from Dynamodb by setting True.
 Default: False::
 
-DYNAMODB_SESSIONS_ALWAYS_CONSISTENT = False
+    DYNAMODB_SESSIONS_ALWAYS_CONSISTENT = False
 
 Versions
 -------
