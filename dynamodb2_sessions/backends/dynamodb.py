@@ -42,7 +42,7 @@ class SessionStore(SessionBase):
                                        connection = getattr(settings, 'DYNAMODB_CONNECTION', None))
             logger.info("Initialization of SessionStore.")
         else:
-            logger.info("No Session table name for DynamoDB")
+            logger.error("No Session table name for DynamoDB")
 
     def load(self):
         """
@@ -56,8 +56,10 @@ class SessionStore(SessionBase):
                                    consistent = getattr(settings, 'DYNAMODB_SESSIONS_ALWAYS_CONSISTENT', False))
         try:
             if not item.items():
-                raise DynamoDBItemError("Session expired")
+                logger.info("No items with this session key, creating new")
+                raise DynamoDBItemError("No items with this session key")
             if not item['expire_date'] > int(time.mktime(timezone.now().timetuple())):
+                logger.info("Session expired, creating new")
                 raise DynamoDBItemError("Session expired")
             else:
                 logger.info("Item got successfully")
@@ -90,6 +92,7 @@ class SessionStore(SessionBase):
             try:
                 self.save(must_create=True)
             except CreateError:
+                logger.error("Item creation failed")
                 continue
             self.modified = True
             self._session_cache = {}
@@ -115,12 +118,11 @@ class SessionStore(SessionBase):
                 self.table.put_item(data=data)
                 logger.info("Item created successfully")
             except CreateError:
-                logger.info("Item creation failed")
+                logger.error("Item creation failed")
         else:
             item = self.table.get_item(session_key = self._session_key, 
                                        consistent = getattr(settings, 'DYNAMODB_SESSIONS_ALWAYS_CONSISTENT', False))
             if not item.items():
-#                 item['session_key'] = data['session_key']
                 self.table.put_item(data=data)
                 return
             item['data'] = data['data'] 
@@ -144,6 +146,7 @@ class SessionStore(SessionBase):
                                        consistent = getattr(settings, 'DYNAMODB_SESSIONS_ALWAYS_CONSISTENT', False))
         if item.items():
             item.delete()
+            logger.info("Item deleted successfully")
             
     @classmethod
     def clear_expired(cls):
@@ -155,6 +158,7 @@ class SessionStore(SessionBase):
             try:
                 for session in table.scan(expire_date__lt = int(time.mktime(timezone.now().timetuple()))):
                     session.delete()
+                logger.info('Expired sessions deleted successfully')
             except IndexError:
                 logger.info('There is no expired sessions')
             
