@@ -29,15 +29,23 @@ Visit your `DynamoDB tab`_ in the AWS Management Console and follow instructions
 Second step: installation
 -------------
 
-Install django-dynamodb2-sessions using ``pip`` or ``easy_install``::
+Install django-dynamodb2-sessions using ``pip``::
 
     pip install django-dynamodb2-sessions
 
-In your ``settings.py`` file, you'll need set variables::
+Export your AWS key and secret key as environment variables because of security::
 
-    AWS_ACCESS_KEY_ID = '' # set Your AWS key
-    AWS_SECRET_ACCESS_KEY = '' # set Your AWS secret key
-    AWS_REGION_NAME = '' # set Your AWS region
+   export AWS_ACCESS_KEY_ID='YourKey'
+   export AWS_SECRET_ACCESS_KEY='YourSecretKey'
+   export AWS_REGION_NAME = 'Your region'
+
+In your ``settings.py`` file, you'll need set variables::
+     
+    import os
+    AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID'] if os.environ.has_key('AWS_ACCESS_KEY_ID') else '' # set Your AWS key 
+    AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY'] if os.environ.has_key('AWS_SECRET_ACCESS_KEY') else '' # set Your AWS secret key 
+    AWS_REGION_NAME = os.environ['AWS_REGION_NAME'] if os.environ.has_key('AWS_REGION_NAME') else '' # set Your AWS region
+    
     DYNAMODB_SESSIONS_TABLE_NAME = '' # set Your sessions table name
 
 Set your session backend to::
