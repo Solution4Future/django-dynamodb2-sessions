@@ -37,7 +37,7 @@ Export your AWS key and secret key as environment variables because of security:
 
    export AWS_ACCESS_KEY_ID='YourKey'
    export AWS_SECRET_ACCESS_KEY='YourSecretKey'
-   export AWS_REGION_NAME = 'Your region'
+   export AWS_REGION_NAME = 'YourRegion'
 
 In your ``settings.py`` file, you'll need set variables::
      
