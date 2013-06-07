@@ -42,9 +42,9 @@ Export your AWS key and secret key as environment variables because of security:
 In your ``settings.py`` file, you'll need set variables::
      
     import os
-    AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID'] if os.environ.has_key('AWS_ACCESS_KEY_ID') else '' # set Your AWS key 
-    AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY'] if os.environ.has_key('AWS_SECRET_ACCESS_KEY') else '' # set Your AWS secret key 
-    AWS_REGION_NAME = os.environ['AWS_REGION_NAME'] if os.environ.has_key('AWS_REGION_NAME') else '' # set Your AWS region
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '') # set Your AWS key
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '') # set Your AWS secret key
+    AWS_REGION_NAME = os.environ.get('AWS_REGION_NAME', '') # set Your AWS region
     
     DYNAMODB_SESSIONS_TABLE_NAME = '' # set Your sessions table name
 
