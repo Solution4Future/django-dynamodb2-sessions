@@ -62,6 +62,11 @@ Versions
 
 * Initial release.
 
+0.2
+^^^
+
+* Added removing expired sessions command management.
+
 License
 -------
 
