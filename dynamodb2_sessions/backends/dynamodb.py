@@ -12,8 +12,6 @@ import time
 
 logger = logging.getLogger(__name__)
 
-
-
 def dynamodb2_connection_factory():
     from django.conf import settings
     if getattr(settings,'AWS_ACCESS_KEY_ID', '') and getattr(settings,'AWS_SECRET_ACCESS_KEY', ''):
@@ -109,7 +107,6 @@ class SessionStore(SessionBase):
         """
         if must_create:
             self._session_key = None
-        
         self._get_or_create_session_key()
         data = {'session_key': self._session_key, 'data': self.encode(self._get_session(no_load=must_create)),
                  'expire_date': int(time.mktime(self.get_expiry_date().timetuple())), 'created': int(time.time())}
@@ -150,5 +147,14 @@ class SessionStore(SessionBase):
             
     @classmethod
     def clear_expired(cls):
-        for session in self.table.query(expire_date__lt = int(time.mktime(timezone.now().timetuple()))):
-            session.delete()
+        from boto.dynamodb2.results import ResultSet
+        dynamodb2_connection_factory()
+        if getattr(settings,'DYNAMODB_SESSIONS_TABLE_NAME'):
+            table = Table(table_name = settings.DYNAMODB_SESSIONS_TABLE_NAME,
+                                       connection = getattr(settings, 'DYNAMODB_CONNECTION', None))
+            try:
+                for session in table.scan(expire_date__lt = int(time.mktime(timezone.now().timetuple()))):
+                    session.delete()
+            except IndexError:
+                logger.info('There is no expired sessions')
+            
