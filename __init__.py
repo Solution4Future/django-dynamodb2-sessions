@@ -1,4 +1,4 @@
-__version__ = (0, 2)
+__version__ = (0, 3)
 __author__ = 'Justyna Zarna'
 __contact__ = "justyna.zarna@solution4future.com"
 __docformat__ = "restructuredtext"

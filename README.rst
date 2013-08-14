@@ -75,6 +75,11 @@ Versions
 
 * Added removing expired sessions command management.
 
+0.2
+^^^
+
+* Added new version of boto to requirements
+
 License
 -------
 
