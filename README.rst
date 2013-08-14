@@ -70,7 +70,7 @@ Versions
 
 * Initial release.
 
-0.2
+0.3
 ^^^
 
 * Added removing expired sessions command management.
