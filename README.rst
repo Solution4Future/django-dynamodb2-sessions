@@ -70,12 +70,12 @@ Versions
 
 * Initial release.
 
-0.3
+0.2
 ^^^
 
 * Added removing expired sessions command management.
 
-0.2
+0.3
 ^^^
 
 * Added new version of boto to requirements
