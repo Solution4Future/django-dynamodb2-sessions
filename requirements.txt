@@ -1,2 +1,2 @@
-django==1.4
+django==2.2.24
 boto==2.10.0
